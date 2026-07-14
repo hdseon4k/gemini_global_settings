@@ -1,0 +1,14 @@
+{
+  "id": "4e7a2fca-64b1-4f78-b6e9-181ec9f3f60e",
+  "name": "Week-5",
+  "projectResources": {
+    "resources": [
+      {
+        "gitFolder": {
+          "folderUri": "file:///d%3A/DevOps/bulk/Week-5",
+          "allowWrite": true
+        }
+      }
+    ]
+  }
+}
