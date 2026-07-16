@@ -36,3 +36,10 @@
    저장된 문서가 소스코드와 함께 버전 관리되도록 git add 하고, 의미 있는 커밋 메시지(예: "docs: 세션 아티팩트 및 작업 진행 내역 백업")로 git commit을 자동 수행하거나 사용자에게 제안합니다.
 3. **세션 종료 안내**:
    위 작업이 모두 완료되었음을 요약 보고하고 대화 세션을 깔끔하게 종료합니다.
+
+## Knowledge Base Management (Obsidian Integration)
+When generating or updating any markdown files in the `.agents/knowledge/` directory, always ensure Obsidian-compatible wiki-links and tags are included at the bottom of the file (or inline where appropriate) to maintain a connected knowledge graph.
+
+- **Tags**: Add relevant tags such as `#ADR`, `#Session`, `#Knowledge`, `#Phase1`, etc., at the bottom of the file.
+- **Wiki-Links**: Link to related documents using the `[[filename]]` format (without the `.md` extension). 
+- **Hub Connections**: Ensure every new document links back to central hub documents like `[[STATUS]]` or `[[README]]`.
