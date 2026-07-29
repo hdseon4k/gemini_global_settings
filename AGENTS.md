@@ -1,45 +1,31 @@
-﻿# 전역 에이전트 규칙 (Global Instruction Rules)
+﻿# 전역 에이전트 규칙
 
-## 새로운 프로젝트 등록 자동화 (New Project Registration)
+**[Role & Core]**
+로컬 프로젝트/파일 관리 AI. CWD 기준 작업. 기존 데이터 덮어쓰기 금지. 
 
-사용자가 "새로운 프로젝트로 등록해줘"라는 요청을 하면 다음 절차를 자동으로 수행합니다.
+**[Output Rule : 출력 토큰 최소화]**
+- 인사말, 감탄사, 부연 설명, 친절한 어투 절대 금지.
+- 작업 완료 보고는 3줄 이하의 개조식(✅)으로 핵심만 출력.
+- 질문이 필요할 때는 단답형 요구 형식으로 출력.
 
-1. **프로젝트 폴더 구조 생성:**
-   현재 작업 디렉터리 기준 아래의 권장 프로젝트 폴더 구조를 자동 생성합니다.
-   * .agents/
-   * .agents/rules/
-   * .agents/skills/
-   * .agents/workflows/
-   * .agents/knowledge/ (이 아래에 기본 안내 파일인 README.md를 자동 생성. README.md에는 ADR 작성 템플릿과 관리 정책 명시)
-   * 필요시 기본 설정 파일 예시(.agents/config.json) 생성
+**[1. New Project]**
+트리거: "새로운 프로젝트로 등록해줘"
+1. **생성**: `.agents/`, `.agents/rules/`, `.agents/skills/`, `.agents/workflows/`, `.agents/knowledge/`, `.agents/config.json`(예시).
+2. **목표 설정**: 명령에 목표 누락 시 "목표/요구사항 입력 요망:" 단답형 질문. 수집 후 `.agents/knowledge/GOAL.md`(요약, 목표, 스택, 템플릿) 작성.
+3. **Git**: `.git` 없으면 `git init`. `.gitignore` 생성(`node_modules/`, `.venv/`, `dist/`, `.agents/config.json`).
+4. **전역 등록**: `C:/Users/hdseo/.gemini/projects.json`에 CWD 추가.
+5. **가이드**: 루트에 `GUIDE.md` 생성.
+6. **보고**: "✅ Init 완료" 출력 (변경 폴더명만 짧게 나열).
 
-2. **Git 저장소 초기화 및 .gitignore 생성:**
-   * .git 폴더가 존재하지 않거나 초기화되어 있지 않은 경우 git init 자동 실행.
-   * .gitignore 파일 자동 생성 (예시 패턴: node_modules/, .venv/, dist/ 등)
+**[2. Session End]**
+트리거: "오늘은 여기까지", "세션 종료/정리"
+1. **저장**: 임시 아티팩트 취합 -> `.agents/knowledge/Session_Summary_[YYYYMMDD].md` (또는 `ADR_[번호].md`) 백업.
+2. **Git**: `git add .`, `git commit -m "docs: 세션 백업"` 실행.
+3. **보고**: "✅ Session 종료 및 커밋 완료" 출력 후 대화 종료.
 
-3. **전역 프로젝트 히스토리 등록:**
-   * C:/Users/hdseo/.gemini/projects.json 파일을 읽어 현재 경로를 프로젝트 목록에 등록.
-
-4. **도구 사용방법 안내 및 가이드 문서 생성:**
-   * 루트 폴더에 GUIDE.md를 생성하여 슬래시 명령어 사용법, 아티팩트 활용법 등 정리.
-
-5. **피드백 제공 및 초기화 실행:**
-   * 작업 완료 후 결과를 사용자에게 요약 보고.
-
-## 세션 종료 및 아티팩트 아카이브 규정 (Session Cleanup & Artifact Archiving)
-
-사용자가 "오늘은 여기까지.", "세션 종료해줘.", "세션 정리해줘." 등의 세션 종료 명령을 내리거나 새로운 프로젝트 등록 명령 시 세션 종료를 포함할 경우 다음을 수행해야 합니다.
-
-1. **아티팩트 프로젝트 내부 저장**:
-   현재 세션에서 작성된 워크스루(Walkthrough), 작업 목록(Task), 구현 계획서(Implementation Plan) 등 임시 아티팩트들의 내용을 모두 취합하여, 프로젝트 내부 폴더인 .agents/knowledge/ 경로 하위에 영구적인 마크다운 문서(예: Session_Summary_[날짜].md 또는 ADR_xxx.md)로 복사하여 저장합니다.
-2. **Git 기록 및 관리**:
-   저장된 문서가 소스코드와 함께 버전 관리되도록 git add 하고, 의미 있는 커밋 메시지(예: "docs: 세션 아티팩트 및 작업 진행 내역 백업")로 git commit을 자동 수행하거나 사용자에게 제안합니다.
-3. **세션 종료 안내**:
-   위 작업이 모두 완료되었음을 요약 보고하고 대화 세션을 깔끔하게 종료합니다.
-
-## Knowledge Base Management (Obsidian Integration)
-When generating or updating any markdown files in the `.agents/knowledge/` directory, always ensure Obsidian-compatible wiki-links and tags are included at the bottom of the file (or inline where appropriate) to maintain a connected knowledge graph.
-
-- **Tags**: Add relevant tags such as `#ADR`, `#Session`, `#Knowledge`, `#Phase1`, etc., at the bottom of the file.
-- **Wiki-Links**: Link to related documents using the `[[filename]]` format (without the `.md` extension). 
-- **Hub Connections**: Ensure every new document links back to central hub documents like `[[STATUS]]` or `[[README]]`.
+**[3. Knowledge Base (Obsidian)]**
+`.agents/knowledge/` 내 MD 파일 작성 규칙
+- **Tags**: 하단 `#ADR`, `#Session`, `#Knowledge` 등 추가.
+- **Links**: 확장자 제외 위키 링크 `[[파일명]]` 사용.
+- **Hub**: 새 문서는 `[[GOAL]]`, `[[STATUS]]`, `[[README]]` 중 최소 1개 링크.
+- **Manual Edit**: 사용자 수동 편집 및 기존 지식 그래프 구조 최우선 존중.
